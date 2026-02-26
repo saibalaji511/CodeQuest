@@ -4,16 +4,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CodeQuest - Open Learning</title>
+    <title>CodeQuest Academy - Dashboard</title>
     <link rel="stylesheet" href="style.css">
+    <style>
+        /* Simple layout fixes for the dashboard view */
+        .course-card a {
+            text-decoration: none;
+        }
+
+        .progress-container {
+            max-width: 1200px;
+            margin: 0 auto 2rem auto;
+            background: #fff;
+            padding: 1rem;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+    </style>
 </head>
 
 <body>
 
     <header>
         <h1>CodeQuest Academy</h1>
-        <p>Choose any language and start learning at your own pace.</p>
+        <p>Your portal to mastering programming. Select a language to begin your journey.</p>
     </header>
+
+    <div class="progress-container">
+        <h3 id="progress-text">You have completed 0 of 9 courses</h3>
+    </div>
 
     <div class="course-container" id="course-list">
     </div>
@@ -22,7 +42,73 @@
         <button id="reset-btn">Reset All Progress</button>
     </div>
 
-    <script src="script.js" defer></script>
+    <script>
+        // List of all languages included in your project
+        const courses = [
+            { id: 'c', title: 'C Language', desc: 'The foundation of modern programming.' },
+            { id: 'cpp', title: 'C++', desc: 'High-performance and Object Oriented.' },
+            { id: 'java', title: 'Java', desc: 'Build robust, cross-platform apps.' },
+            { id: 'python', title: 'Python', desc: 'Simple syntax, powerful AI capabilities.' },
+            { id: 'mysql', title: 'MySQL', desc: 'Master relational database management.' },
+            { id: 'css', title: 'CSS3', desc: 'Design beautiful, responsive layouts.' },
+            { id: 'html', title: 'HTML5', desc: 'The backbone of every web page.' },
+            { id: 'xml', title: 'XML', desc: 'Data storage and configuration format.' },
+            { id: 'js', title: 'JavaScript', desc: 'Make your websites interactive.' }
+        ];
+
+        // Retrieve saved progress from the browser
+        let completedCourses = JSON.parse(localStorage.getItem('userProgress')) || [];
+
+        function renderDashboard() {
+            const container = document.getElementById('course-list');
+            const progressDisplay = document.getElementById('progress-text');
+            container.innerHTML = '';
+
+            // Update Progress Header
+            progressDisplay.innerText = `You have completed ${completedCourses.length} of ${courses.length} courses`;
+
+            courses.forEach((course) => {
+                const isCompleted = completedCourses.includes(course.id);
+
+                let cardClass = 'course-card';
+                let statusHtml = '';
+                let btnText = 'Start Learning';
+
+                if (isCompleted) {
+                    cardClass += ' completed';
+                    statusHtml = `<span class="status-badge status-completed">Completed ✓</span>`;
+                    btnText = 'Review Course';
+                } else {
+                    statusHtml = `<span class="status-badge status-active">New Course</span>`;
+                }
+
+                const card = document.createElement('div');
+                card.className = cardClass;
+                card.innerHTML = `
+                    ${statusHtml}
+                    <h2>${course.title}</h2>
+                    <p>${course.desc}</p>
+                    <a href="course.html?lang=${course.id}">
+                        <button>${btnText}</button>
+                    </a>
+                `;
+
+                container.appendChild(card);
+            });
+        }
+
+        // Logic for the Reset button
+        document.getElementById('reset-btn').addEventListener('click', function () {
+            if (confirm('This will erase all your learning history. Are you sure?')) {
+                completedCourses = [];
+                localStorage.removeItem('userProgress');
+                renderDashboard();
+            }
+        });
+
+        // Initialize the page
+        renderDashboard();
+    </script>
 </body>
 
 </html>

@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Course Viewer</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* Specific styles for the course viewer layout */
+        .viewer-container {
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            min-height: 80vh;
+        }
+
+        .sidebar {
+            background: white;
+            padding: 1rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .sidebar h3 {
+            margin-top: 0;
+            color: var(--primary);
+        }
+
+        .topic-btn {
+            display: block;
+            width: 100%;
+            text-align: left;
+            background: none;
+            color: #333;
+            margin-bottom: 0.5rem;
+            padding: 0.5rem;
+            border: 1px solid #eee;
+        }
+
+        .topic-btn:hover,
+        .topic-btn.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .content-area {
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        pre {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 1rem;
+            border-radius: 6px;
+            overflow-x: auto;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-bottom: 1rem;
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+
+    <a href="index.html" class="back-link">← Back to Dashboard</a>
+
+    <div class="viewer-container">
+        <aside class="sidebar">
+            <h3>Course Topics</h3>
+            <div id="topic-list">
+            </div>
+        </aside>
+
+        <main class="content-area">
+            <h1 id="lesson-title">Select a topic...</h1>
+            <p id="lesson-content"></p>
+            <div id="code-block" style="display:none;">
+                <h4>Example Code:</h4>
+                <pre><code id="lesson-code"></code></pre>
+            </div>
+            <button id="finish-btn" style="display:none; margin-top:2rem;" onclick="markComplete()">Complete
+                Course</button>
+        </main>
+    </div>
+
+    <script src="data.js"></script>
+    <script>
+        // 1. Get the language from the URL (e.g., course.html?lang=python)
+        const urlParams = new URLSearchParams(window.location.search);
+        const lang = urlParams.get('lang');
+
+        // 2. Load content for that language
+        const course = courseContent[lang];
+
+        if (course) {
+            document.title = course.title + " - CodeQuest";
+
+            // Populate Sidebar
+            const topicList = document.getElementById('topic-list');
+            course.topics.forEach((topic, index) => {
+                const btn = document.createElement('button');
+                btn.className = 'topic-btn';
+                btn.innerText = topic.title;
+                btn.onclick = () => loadTopic(index);
+                topicList.appendChild(btn);
+            });
+
+            // Load first topic by default
+            loadTopic(0);
+        } else {
+            document.body.innerHTML = "<h1>Course not found!</h1>";
+        }
+
+        function loadTopic(index) {
+            const topic = course.topics[index];
+            document.getElementById('lesson-title').innerText = topic.title;
+            document.getElementById('lesson-content').innerText = topic.content;
+
+            const codeBlock = document.getElementById('code-block');
+            if (topic.code) {
+                codeBlock.style.display = 'block';
+                document.getElementById('lesson-code').innerText = topic.code;
+            } else {
+                codeBlock.style.display = 'none';
+            }
+
+            // Highlight active button
+            const buttons = document.querySelectorAll('.topic-btn');
+            buttons.forEach(b => b.classList.remove('active'));
+            buttons[index].classList.add('active');
+
+            // Show complete button if it's the last topic
+            const finishBtn = document.getElementById('finish-btn');
+            if (index === course.topics.length - 1) {
+                finishBtn.style.display = 'block';
+            } else {
+                finishBtn.style.display = 'none';
+            }
+        }
+
+        function markComplete() {
+            // Get existing progress
+            let completed = JSON.parse(localStorage.getItem('userProgress')) || [];
+            if (!completed.includes(lang)) {
+                completed.push(lang);
+                localStorage.setItem('userProgress', JSON.stringify(completed));
+            }
+            alert("Course Completed! Redirecting to Dashboard...");
+            window.location.href = "index.html";
+        }
+    </script>
+</body>
+
+</html>
