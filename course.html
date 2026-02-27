@@ -81,16 +81,25 @@
             <div id="topic-list">
             </div>
         </aside>
-
         <main class="content-area">
             <h1 id="lesson-title">Select a topic...</h1>
             <p id="lesson-content"></p>
-            <div id="code-block" style="display:none;">
-                <h4>Example Code:</h4>
+
+            <div id="code-block" class="ide-window" style="display:none;">
+                <div class="ide-header">
+                    <div class="ide-dot dot-red"></div>
+                    <div class="ide-dot dot-yellow"></div>
+                    <div class="ide-dot dot-green"></div>
+                    <span
+                        style="margin-left: 10px; color: #8b949e; font-family: monospace; font-size: 0.85rem;">terminal
+                        — bash</span>
+                </div>
                 <pre><code id="lesson-code"></code></pre>
             </div>
-            <button id="finish-btn" style="display:none; margin-top:2rem;" onclick="markComplete()">Complete
-                Course</button>
+
+            <button id="finish-btn"
+                style="display:none; margin-top:3rem; background-color: var(--success); color: white; border: none;"
+                onclick="markComplete()">Mark Course Complete ✓</button>
         </main>
     </div>
 
